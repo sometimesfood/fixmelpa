@@ -50,6 +50,8 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
 (defun fixmelpa-refresh-pinned-packages ()
   "Pin packages in MELPA stable and unstable to stable.
 
@@ -73,21 +75,40 @@ This modifies `package-pinned-packages'. "
                 result))))
     result))
 
-(defun fixmelpa-unstable-name ()
-  "Return the name of the unstable MELPA repository."
+(defun fixmelpa-any-p (predicate seq)
+  "Return non-nil if PREDICATE returns a non-nil value for some
+element of SEQ."
+  (not (null (cl-find-if predicate seq))))
+
+(defun fixmelpa-string-match-any (regexps string)
+  "Return non-nil if STRING matches any of the regular
+expressions in REGEXPS."
+  (fixmelpa-any-p (lambda (regexp) (string-match regexp string))
+                  regexps))
+
+(defvar fixmelpa-unstable-urls
+  '("http://melpa\\.milkbox\\.net/packages"
+    "http://melpa\\.org/packages")
+  "List of MELPA unstable URL regexps")
+
+(defvar fixmelpa-stable-urls
+  '("http://melpa-stable\\.milkbox\\.net/packages"
+    "http://stable\\.melpa\\.org/packages")
+  "List of MELPA stable URL regexps")
+
+(defun fixmelpa-repo-name (urls)
   (catch 'return
     (dolist (archive package-archives)
-      (when (string-match "http://melpa\\.milkbox\\.net/packages"
-                          (cdr archive))
+      (when (fixmelpa-string-match-any urls (cdr archive))
         (throw 'return (car archive))))))
 
+(defun fixmelpa-unstable-name ()
+  "Return the name of the unstable MELPA repository."
+  (fixmelpa-repo-name fixmelpa-unstable-urls))
+
 (defun fixmelpa-stable-name ()
-    "Return the name of the stable MELPA repository."
-  (catch 'return
-    (dolist (archive package-archives)
-      (when (string-match "http://hiddencameras\\.milkbox\\.net/packages"
-                          (cdr archive))
-        (throw 'return (car archive))))))
+  "Return the name of the stable MELPA repository."
+  (fixmelpa-repo-name fixmelpa-stable-urls))
 
 (defun fixmelpa-unstable-version-p (version)
   "Return non-nil if VERSION is a bogus MELPA version."
