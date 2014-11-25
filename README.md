@@ -9,8 +9,9 @@ To ensure that you will always install packages from MELPA stable
 if available, add the following to your .emacs:
 
 ```Lisp
-(add-function :before (package-refresh-contents)
-              #'fixmelpa-refresh-pinned-packages)
+(defadvice package-refresh-contents (before ad-fixmelpa-refresh-pinned-packages)
+  "Refresh pinned packages before refreshing package contents."
+  (fixmelpa-refresh-pinned-packages))
 ```
 
 To reinstall packages installed from unstable, if possible, use
