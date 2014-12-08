@@ -121,7 +121,7 @@ expressions in REGEXPS."
   (let ((packages nil))
     (dolist (pair package-alist)
       (dolist (pkg-desc (cdr pair))
-        (when (remove-melpa-melpa-version-p (package-desc-version pkg-desc))
+        (when (fixmelpa-unstable-version-p (package-desc-version pkg-desc))
           (push pkg-desc packages))))
     packages))
 
