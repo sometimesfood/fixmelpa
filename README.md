@@ -10,7 +10,7 @@ if available, add the following to your .emacs:
 
 ```Lisp
 (defadvice package-refresh-contents
-    (before ad-fixmelpa-refresh-pinned-packages)
+    (before ad-fixmelpa-refresh-pinned-packages activate)
   "Refresh pinned packages before refreshing package contents."
   (fixmelpa-refresh-pinned-packages))
 ```
